@@ -26,6 +26,18 @@ function check_docker_is_install {
     fi
 }
 
+function update_docker_image {
+    local prev_docker_id=$(docker inspect --format='{{.Id}}' mickaelguene/stm32flasher:latest 2> /dev/null)
+    local foo=$(docker pull mickaelguene/stm32flasher:latest 2> /dev/null)
+    local current_docker_id=$(docker inspect --format='{{.Id}}' mickaelguene/stm32flasher:latest 2> /dev/null)
+
+    if [ ! "${prev_docker_id}" == "${current_docker_id}" ]; then
+        if [ ! "${prev_docker_id}" == "" ]; then
+            foo=$(docker rmi ${prev_docker_id} 2> /dev/null)
+        fi
+    fi
+}
+
 function supported_board_cfg {
     local cfgs=$(docker run --rm mickaelguene/stm32flasher:latest bash -c 'ls /usr/local/share/openocd/scripts/board/stm32*' 2> /dev/null)
     local res=""
@@ -53,6 +65,9 @@ fi
 
 #sanity check
 check_docker_is_install
+
+#update image
+update_docker_image
 
 #check board is support
 if [[ ! $(supported_board_cfg) == *"$1.cfg"* ]] ; then
