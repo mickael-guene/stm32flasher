@@ -1,0 +1,83 @@
+#!/bin/bash
+
+# This file is part of stm32flasher, an stm32 flasher tool using docker.
+#
+# Copyright (C) 2016 STMicroelectronics
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301 USA.
+
+function check_docker_is_install {
+    if [ ! "$(docker -v 2> /dev/null)" ]; then
+        echo "Unable to detect docker. Is docker installed ?"
+        exit 1
+    fi
+}
+
+function supported_board_cfg {
+    local cfgs=$(docker run --rm mickaelguene/openocd:0.9.0 bash -c 'ls /usr/local/share/openocd/scripts/board/stm32*' 2> /dev/null)
+    local res=""
+    for cfg in $cfgs; do
+        res="$res "$(basename $cfg)
+    done
+
+    echo $res
+}
+
+function supported_board_name {
+    local cfgs=$(supported_board_cfg)
+    local res=""
+    for cfg in $cfgs; do
+        res="$res "${cfg%.*}
+    done
+
+    echo $res
+}
+
+if [ $# -ne 2 ]; then
+    echo "usage: $0 <boardname> <file_to_flash>"
+    exit 1
+fi
+
+#sanity check
+check_docker_is_install
+
+#check board is support
+if [[ ! $(supported_board_cfg) == *"$1.cfg"* ]] ; then
+    echo "Board '$1' is not supported, list of supported boards follow :"
+    echo $(supported_board_name)
+    exit 1
+fi
+
+#test elf file exist
+if [ ! -e $2 ]; then
+    echo "Unable to find flash image '$2'"
+    exit 1
+fi
+
+#flash it
+TMPFILE=`mktemp` && trap "rm -f $TMPFILE" EXIT
+PRG=`realpath $2`
+
+cat << EOF > $TMPFILE
+init
+reset halt
+program $PRG
+reset halt
+wait_halt
+exit
+EOF
+
+docker run --privileged -v $TMPFILE:/flash.cfg -v $PRG:$PRG -v /dev/bus/usb:/dev/bus/usb -it --rm mickaelguene/openocd:0.9.0 openocd -f /usr/local/share/openocd/scripts/board/$1.cfg -f /flash.cfg
