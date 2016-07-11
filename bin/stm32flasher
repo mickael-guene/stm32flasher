@@ -27,7 +27,7 @@ function check_docker_is_install {
 }
 
 function supported_board_cfg {
-    local cfgs=$(docker run --rm mickaelguene/openocd:0.9.0 bash -c 'ls /usr/local/share/openocd/scripts/board/stm32*' 2> /dev/null)
+    local cfgs=$(docker run --rm mickaelguene/stm32flasher:LATEST bash -c 'ls /usr/local/share/openocd/scripts/board/stm32*' 2> /dev/null)
     local res=""
     for cfg in $cfgs; do
         res="$res "$(basename $cfg)
