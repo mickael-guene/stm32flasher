@@ -80,4 +80,4 @@ wait_halt
 exit
 EOF
 
-docker run --privileged -v $TMPFILE:/flash.cfg -v $PRG:$PRG -v /dev/bus/usb:/dev/bus/usb -it --rm mickaelguene/openocd:0.9.0 openocd -f /usr/local/share/openocd/scripts/board/$1.cfg -f /flash.cfg
+docker run --privileged -v $TMPFILE:/flash.cfg -v $PRG:$PRG -v /dev/bus/usb:/dev/bus/usb -it --rm mickaelguene/stm32flasher:latest openocd -f /usr/local/share/openocd/scripts/board/$1.cfg -f /flash.cfg
