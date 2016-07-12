@@ -26,6 +26,9 @@ git init
 git config user.name ${GIT_USER_NAME}
 git config user.email ${GIT_USER_EMAIL}
 git remote add origin https://github.com/"$TRAVIS_REPO_SLUG"
+
+#pull last commit
+git pull --depth=1 origin ${DOCKER_BRANCH}
 git checkout -b ${DOCKER_BRANCH}
 
 #create commit
