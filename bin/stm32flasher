@@ -49,7 +49,7 @@ function update_docker_image {
 }
 
 function supported_board_cfg {
-    local cfgs=$(docker run --rm mickaelguene/stm32flasher:${DOCKER_TAG} bash -c 'ls /usr/local/share/openocd/scripts/board/stm32*' 2> /dev/null)
+    local cfgs=$(docker run --rm mickaelguene/stm32flasher:${DOCKER_TAG} dash -c 'ls /usr/share/openocd/scripts/board/stm32*' 2> /dev/null)
     local res=""
     for cfg in $cfgs; do
         res="$res "$(basename $cfg)
@@ -108,4 +108,4 @@ wait_halt
 exit
 EOF
 
-docker run --privileged -v $TMPFILE:/flash.cfg -v $PRG:$PRG -v /dev/bus/usb:/dev/bus/usb -it --rm mickaelguene/stm32flasher:${DOCKER_TAG} openocd -f /usr/local/share/openocd/scripts/board/$1.cfg -f /flash.cfg
+docker run --privileged -v $TMPFILE:/flash.cfg -v $PRG:$PRG -v /dev/bus/usb:/dev/bus/usb -it --rm mickaelguene/stm32flasher:${DOCKER_TAG} openocd -f /usr/share/openocd/scripts/board/$1.cfg -f /flash.cfg
