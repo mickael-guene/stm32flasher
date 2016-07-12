@@ -34,7 +34,7 @@ git checkout -b ${DOCKER_BRANCH}
 #create commit
 cat << EOF > Dockerfile
 FROM scratch
-MAINTAINER ${GIT_USER_NAME} <${GIT_USER_EMAIL>
+MAINTAINER ${GIT_USER_NAME} <${GIT_USER_EMAIL}>
 
 ADD rootfs.tar.xz /
 
