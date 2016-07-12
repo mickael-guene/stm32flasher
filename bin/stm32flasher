@@ -19,6 +19,16 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA.
 
+#docker default tag
+DOCKER_TAG=docker_latest
+function setup_docker_tag {
+    local branch="$(git symbolic-ref HEAD 2>/dev/null)" || local branch=""
+
+    if [ ! "$branch" == "" ]; then
+        DOCKER_TAG=docker_${branch##refs/heads/}
+    fi
+}
+
 function check_docker_is_install {
     if [ ! "$(docker -v 2> /dev/null)" ]; then
         echo "Unable to detect docker. Is docker installed ?"
@@ -27,9 +37,9 @@ function check_docker_is_install {
 }
 
 function update_docker_image {
-    local prev_docker_id=$(docker inspect --format='{{.Id}}' mickaelguene/stm32flasher:latest 2> /dev/null)
-    local foo=$(docker pull mickaelguene/stm32flasher:latest 2> /dev/null)
-    local current_docker_id=$(docker inspect --format='{{.Id}}' mickaelguene/stm32flasher:latest 2> /dev/null)
+    local prev_docker_id=$(docker inspect --format='{{.Id}}' mickaelguene/stm32flasher:${DOCKER_TAG} 2> /dev/null)
+    local foo=$(docker pull mickaelguene/stm32flasher:${DOCKER_TAG} 2> /dev/null)
+    local current_docker_id=$(docker inspect --format='{{.Id}}' mickaelguene/stm32flasher:${DOCKER_TAG} 2> /dev/null)
 
     if [ ! "${prev_docker_id}" == "${current_docker_id}" ]; then
         if [ ! "${prev_docker_id}" == "" ]; then
@@ -39,7 +49,7 @@ function update_docker_image {
 }
 
 function supported_board_cfg {
-    local cfgs=$(docker run --rm mickaelguene/stm32flasher:latest bash -c 'ls /usr/local/share/openocd/scripts/board/stm32*' 2> /dev/null)
+    local cfgs=$(docker run --rm mickaelguene/stm32flasher:${DOCKER_TAG} bash -c 'ls /usr/local/share/openocd/scripts/board/stm32*' 2> /dev/null)
     local res=""
     for cfg in $cfgs; do
         res="$res "$(basename $cfg)
@@ -62,6 +72,9 @@ if [ $# -ne 2 ]; then
     echo "usage: $0 <boardname> <file_to_flash>"
     exit 1
 fi
+
+#setup docker tag
+setup_docker_tag
 
 #sanity check
 check_docker_is_install
@@ -95,4 +108,4 @@ wait_halt
 exit
 EOF
 
-docker run --privileged -v $TMPFILE:/flash.cfg -v $PRG:$PRG -v /dev/bus/usb:/dev/bus/usb -it --rm mickaelguene/stm32flasher:latest openocd -f /usr/local/share/openocd/scripts/board/$1.cfg -f /flash.cfg
+docker run --privileged -v $TMPFILE:/flash.cfg -v $PRG:$PRG -v /dev/bus/usb:/dev/bus/usb -it --rm mickaelguene/stm32flasher:${DOCKER_TAG} openocd -f /usr/local/share/openocd/scripts/board/$1.cfg -f /flash.cfg
