@@ -1,0 +1,13 @@
+sudo: required
+dist: trusty
+language: c
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq bc libc6-i386
+
+script:
+  - ./.travis/build.sh
+
+after_success:
+  - ./.travis/deploy.sh
