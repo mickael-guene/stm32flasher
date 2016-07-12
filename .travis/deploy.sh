@@ -2,7 +2,7 @@
 
 #variable that change build result
 DOCKER_BRANCH=docker/${TRAVIS_BRANCH}
-GIT_USER_NAME=Travis
+GIT_USER_NAME="Mickael Guene"
 GIT_USER_EMAIL=mickael.guene@st.com
 
 #get script location
@@ -31,7 +31,7 @@ git checkout -b ${DOCKER_BRANCH}
 #create commit
 cat << EOF > Dockerfile
 FROM scratch
-MAINTAINER Mickael Guene <mickael.guene@st.com>
+MAINTAINER ${GIT_USER_NAME} <${GIT_USER_EMAIL>
 
 ADD rootfs.tar.xz /
 
