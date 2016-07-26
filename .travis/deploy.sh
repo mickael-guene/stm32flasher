@@ -14,11 +14,11 @@ WDIR=`mktemp -d` && trap "rm -Rf $WDIR" EXIT
 
 #add deploy key
 cd ${SCRIPTDIR}
-openssl aes-256-cbc -K $encrypted_5f2526413454_key -iv $encrypted_5f2526413454_iv -in deploy_key.enc -out deploy_key -d
-chmod 600 deploy_key
+#openssl aes-256-cbc -K $encrypted_5f2526413454_key -iv $encrypted_5f2526413454_iv -in deploy_key.enc -out deploy_key -d
+chmod 600 .travis/deploy_key
 eval `ssh-agent -s`
-ssh-add deploy_key
-rm deploy_key
+ssh-add .travis/deploy_key
+rm .travis/deploy_key
 
 #switch to tmp dir and setup new git repo
 cd ${WDIR}
