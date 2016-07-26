@@ -10,5 +10,8 @@ script:
   - ./.travis/build.sh
 
 after_success:
-  - openssl aes-256-cbc -K $encrypted_4da671c907a1_key -iv $encrypted_4da671c907a1_iv -in .travis/deploy_key.enc -out .travis/deploy_key -d
   - ./.travis/deploy.sh
+
+env:
+  global:
+    - ENCRYPTION_LABEL="4da671c907a1"
