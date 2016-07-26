@@ -14,6 +14,7 @@ WDIR=`mktemp -d` && trap "rm -Rf $WDIR" EXIT
 
 #add deploy key
 cd ${SCRIPTDIR}
+set +x
 ENCRYPTED_KEY_VAR="encrypted_${ENCRYPTION_LABEL}_key"
 ENCRYPTED_IV_VAR="encrypted_${ENCRYPTION_LABEL}_iv"
 ENCRYPTED_KEY=${!ENCRYPTED_KEY_VAR}
@@ -23,6 +24,7 @@ chmod 600 deploy_key
 eval `ssh-agent -s`
 ssh-add deploy_key
 rm deploy_key
+set -x
 
 #switch to tmp dir and setup new git repo
 cd ${WDIR}
