@@ -25,7 +25,9 @@ function setup_docker_tag {
     local branch="$(git symbolic-ref HEAD 2>/dev/null)" || local branch=""
 
     if [ ! "$branch" == "" ]; then
-        DOCKER_TAG=docker_${branch##refs/heads/}
+        if git remote show origin -n | grep 'Fetch URL:' | grep stm32flasher.git > /dev/null 2>/dev/null ; then
+            DOCKER_TAG=docker_${branch##refs/heads/}
+        fi
     fi
 }
 
