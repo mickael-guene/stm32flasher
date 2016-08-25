@@ -52,8 +52,12 @@ function update_docker_image {
 
 function supported_board_cfg {
     local cfgs=$(docker run --rm mickaelguene/stm32flasher:${DOCKER_TAG} sh -c 'ls /usr/share/openocd/scripts/board/stm32*' 2> /dev/null)
+    local cfgs_nucleo=$(docker run --rm mickaelguene/stm32flasher:${DOCKER_TAG} sh -c 'ls /usr/share/openocd/scripts/board/st_nucleo*' 2> /dev/null)
     local res=""
     for cfg in $cfgs; do
+        res="$res "$(basename $cfg)
+    done
+    for cfg in $cfgs_nucleo; do
         res="$res "$(basename $cfg)
     done
 
